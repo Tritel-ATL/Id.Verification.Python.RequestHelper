@@ -69,3 +69,16 @@ $env:CODEARTIFACT_AUTH_TOKEN = aws codeartifact get-authorization-token --profil
 ```powershell
 pip config set site.extra-index-url https://aws:$env:CODEARTIFACT_AUTH_TOKEN@tritelcares-633259327350.d.codeartifact.ap-southeast-1.amazonaws.com/pypi/id-verification-python-repos/simple/
 ```
+
+### Linux
+
+#### Setup the authentication
+Replace the profile if needed
+```bash
+export CODEARTIFACT_AUTH_TOKEN=`aws codeartifact get-authorization-token --profile tritel --domain tritelcares --domain-owner 633259327350 --region ap-southeast-1 --query authorizationToken --output text`
+```
+
+#### Add the pip library index
+```bash
+pip config set site.extra-index-url https://aws:$env:CODEARTIFACT_AUTH_TOKEN@tritelcares-633259327350.d.codeartifact.ap-southeast-1.amazonaws.com/pypi/id-verification-python-repos/simple/
+```

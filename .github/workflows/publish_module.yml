@@ -37,7 +37,7 @@ jobs:
 
       - name: Setup CodeArtifact and Install UserHelper Package
         run: |
-          $env:CODEARTIFACT_AUTH_TOKEN = aws codeartifact get-authorization-token --domain tritelcares --domain-owner 633259327350 --query authorizationToken --output text
+          export CODEARTIFACT_AUTH_TOKEN=`aws codeartifact get-authorization-token --domain tritelcares --domain-owner 633259327350 --region ap-southeast-1 --query authorizationToken --output text`
           pip config set site.extra-index-url https://aws:$env:CODEARTIFACT_AUTH_TOKEN@tritelcares-633259327350.d.codeartifact.ap-southeast-1.amazonaws.com/pypi/id-verification-python-repos/simple/
           pip install id_verification_python_userhelper
     
