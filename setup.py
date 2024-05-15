@@ -33,7 +33,8 @@ setuptools.setup(
     ], install_requires=[ 
         'requests', 
         'logging',
-        'multipledispatch'
+        'multipledispatch',
+        'id_verification_python_userhelper'
     ],
     extras_require={
         "dev": ["pytest>=7.0", "twine>=5.0.0"]

@@ -1,1 +1,1 @@
-from id_verification_python_requesthelper import RequestHelper
+from id_verification_python_requesthelper.id_verification_python_requesthelper import RequestHelper
