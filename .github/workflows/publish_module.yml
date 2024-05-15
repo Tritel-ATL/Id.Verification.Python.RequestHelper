@@ -1,0 +1,50 @@
+name: Publish Package
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+
+  publish:
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+      contents: read
+
+    steps:
+
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-region: ap-southeast-1 # change to appropriate region
+          role-to-assume: arn:aws:iam::633259327350:role/GH_Trusted_For_Workflows
+          role-session-name: RepoPublishPackage
+          role-duration-seconds: 900
+
+      - name: Set Up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: 3.12
+
+      - name: Install Twine
+        run: |
+          pip install wheel twine setuptools
+
+      - name: Setup CodeArtifact and Install UserHelper Package
+        run: |
+          $env:CODEARTIFACT_AUTH_TOKEN = aws codeartifact get-authorization-token --domain tritelcares --domain-owner 633259327350 --query authorizationToken --output text
+          pip config set site.extra-index-url https://aws:$env:CODEARTIFACT_AUTH_TOKEN@tritelcares-633259327350.d.codeartifact.ap-southeast-1.amazonaws.com/pypi/id-verification-python-repos/simple/
+          pip install id_verification_python_userhelper
+    
+      - name: Build Package
+        run: |
+          python setup.py sdist
+      - name: Publish Package
+        run: |
+          aws codeartifact login --tool twine --domain tritelcares --repository id-verification-python-repos &&
+          twine upload --repository codeartifact dist/*
