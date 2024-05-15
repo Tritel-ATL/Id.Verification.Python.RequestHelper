@@ -16,7 +16,7 @@ packages = setuptools.find_packages(
 
 setuptools.setup(
     name="id_verification_python_requesthelper",
-    version="0.0.2",
+    version="0.0.3",
     author="Sam D Ware",
     author_email="sware@tritelph.com",
     description="A library to interact with the ID Verification Request APIs",
