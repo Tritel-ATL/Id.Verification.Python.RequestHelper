@@ -55,6 +55,17 @@ Create Bulk Request Data Element
 ###### Returns:
 - Bulk Request Data Element
 
+##### BulkRequestFileExists
+Check if the Filename has already been used to create a Bulk Request for the Customer and Workflow
+###### Parameters: 
+- customerId (str): Customer Id
+- workflowId (str): Workflow Id
+- filename (str): Filename to be checked
+
+
+###### Returns:
+- bool: whether or not the filename exists
+
 
 ## Setup PIP to install libraries
 ### Powershell Windows
@@ -81,4 +92,14 @@ export CODEARTIFACT_AUTH_TOKEN=`aws codeartifact get-authorization-token --profi
 #### Add the pip library index
 ```bash
 pip config set site.extra-index-url https://aws:$env:CODEARTIFACT_AUTH_TOKEN@tritelcares-633259327350.d.codeartifact.ap-southeast-1.amazonaws.com/pypi/id-verification-python-repos/simple/
+```
+
+## Use Example
+
+```python
+from id_verification_python_requesthelper import RequestHelper
+
+requesthelper = RequestHelper("##USERNAME##", "##PASSWORD##")
+
+request_information = requesthelper.getBulkRequest("565f136b-a366-48aa-9d43-2060d258607f")
 ```

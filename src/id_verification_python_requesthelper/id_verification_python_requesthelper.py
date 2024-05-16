@@ -243,7 +243,33 @@ class RequestHelper:
             return bulkRequestDataElement
         else:
             return Exception(f"Error: {response.status_code} - {response._content}")
- 
+        
+    def checkBulkRequestFileExists (self, customerId: str, workflowId: str, filename: str):
+        """
+        Check if the Filename has already been used to create a Bulk Request for the Customer and Workflow
+
+        Args:
+            customerId (str): Customer Id
+            workflowId (str): Workflow Id
+            filename (str): Filename to be checked
+
+
+        Returns:
+            bool: whether or not the filename exists
+        """
+        headers = {'Authorization': f'Bearer {self.userHelper.getToken()}', 'accept': 'application/json', 'Content-Type': 'application/json'}
+        data = f'{{"customerId": "{customerId}", "workflowId": "{workflowId}", "filename": "{filename}"}}'
+        log.debug(f"RequestHelper URL: http://{self.__apiUrl}/BulkRequestDataElement/BulkRequestFileExists?api-version=0.2")
+        log.debug(f"RequestHelper.BulkRequestFileExists: {data}")
+        response = requests.put(f'http://{self.__apiUrl}/BulkRequestDataElement/BulkRequestFileExists?api-version=0.2', headers=headers, data=data)
+        if response.status_code == 200:
+            jsonResponse = response.json()
+            reply: bool = response.json()['exists']
+            return reply
+        else:
+            return Exception(f"Error: {response.status_code} - {response._content}")
+        
+        
 class BulkRequestStatus(Enum):
     # <summary>The bulk request is newly created.  And has no processing started or completed on it.</summary>
     New = 1
