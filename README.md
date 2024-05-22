@@ -91,7 +91,7 @@ export CODEARTIFACT_AUTH_TOKEN=`aws codeartifact get-authorization-token --profi
 
 #### Add the pip library index
 ```bash
-pip config set site.extra-index-url https://aws:$env:CODEARTIFACT_AUTH_TOKEN@tritelcares-633259327350.d.codeartifact.ap-southeast-1.amazonaws.com/pypi/id-verification-python-repos/simple/
+pip config set site.extra-index-url https://aws:$CODEARTIFACT_AUTH_TOKEN@tritelcares-633259327350.d.codeartifact.ap-southeast-1.amazonaws.com/pypi/id-verification-python-repos/simple/
 ```
 
 ## Use Example
