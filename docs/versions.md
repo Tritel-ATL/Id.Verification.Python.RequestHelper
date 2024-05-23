@@ -11,3 +11,6 @@ Add the **checkBulkRequestFileExists** feature.
 
 ### 0.5
 Removes the import of logging to try and resolve an issue.
+
+### 0.6
+Rebuild the package to see the logging issue still occurs
