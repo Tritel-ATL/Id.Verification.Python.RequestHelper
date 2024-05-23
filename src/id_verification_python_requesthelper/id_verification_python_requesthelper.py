@@ -1,9 +1,11 @@
 import boto3
 from datetime import datetime
 from enum import Enum
+from id_verification_python_userhelper import UserHelper
+import logging
 from multipledispatch import dispatch
 import requests
-from id_verification_python_userhelper import UserHelper
+
 
 log = logging.getLogger(__name__)
 
