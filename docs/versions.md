@@ -14,3 +14,6 @@ Removes the import of logging to try and resolve an issue.
 
 ### 0.6
 Rebuild the package to see the logging issue still occurs
+
+### 0.7
+Remove logging from the required package list
