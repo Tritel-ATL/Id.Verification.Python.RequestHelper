@@ -101,10 +101,12 @@ class RequestHelper:
         
         # Setup AWS Client
         ssmSession = None
-        if boto3.Session(profile_name='tritel') != None:
+        try:
             ssmSession = boto3.Session(profile_name='tritel')
-        else:
+        except Exception as ex:
+            log.warning(f"Error trying to use the Tritel Profile (using Default instead): {ex}")
             ssmSession = boto3.Session()
+        
         ssmClient = ssmSession.client('ssm')
         
         # Get the API URL

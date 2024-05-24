@@ -17,3 +17,6 @@ Rebuild the package to see the logging issue still occurs
 
 ### 0.7
 Remove logging from the required package list
+
+### 0.8
+Change the way that the library tries to use the Tritel profile
