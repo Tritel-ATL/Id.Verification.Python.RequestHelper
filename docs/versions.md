@@ -21,8 +21,5 @@ Remove logging from the required package list
 ### 0.8
 Change the way that the library tries to use the Tritel profile
 
-### 0.9
-Change outputs on the create functions to be JSON strings
-
-### .10
-Change dump to dumps (typo)
+### 0.11
+Revert Previous Changes
