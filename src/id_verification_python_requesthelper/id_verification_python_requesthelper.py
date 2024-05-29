@@ -2,6 +2,7 @@ import boto3
 from datetime import datetime
 from enum import Enum
 from id_verification_python_userhelper import UserHelper
+import json
 import logging
 from multipledispatch import dispatch
 import requests
@@ -177,7 +178,7 @@ class RequestHelper:
             bulkRequest.updatedOn = jsonResponse['bulkRequest']['updatedOn']
             bulkRequest.completedOn = jsonResponse['bulkRequest']['completedOn']
             bulkRequest.deletedOn = jsonResponse['bulkRequest']['deletedOn']
-            return bulkRequest
+            return json.dump(bulkRequest)
         else:
             return Exception(f"Error: {response.status_code} - {response._content}")
 
@@ -243,7 +244,7 @@ class RequestHelper:
             bulkRequestDataElement.CreatedOn = jsonResponse['bulkRequestDataElement']['createdOn']
             bulkRequestDataElement.UpdatedOn = jsonResponse['bulkRequestDataElement']['updatedOn']
             bulkRequestDataElement.DeletedOn = jsonResponse['bulkRequestDataElement']['deletedOn']
-            return bulkRequestDataElement
+            return json.dump(bulkRequestDataElement)
         else:
             return Exception(f"Error: {response.status_code} - {response._content}")
         
