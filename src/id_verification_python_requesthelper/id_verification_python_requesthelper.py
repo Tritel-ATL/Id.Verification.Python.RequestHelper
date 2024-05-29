@@ -178,7 +178,7 @@ class RequestHelper:
             bulkRequest.updatedOn = jsonResponse['bulkRequest']['updatedOn']
             bulkRequest.completedOn = jsonResponse['bulkRequest']['completedOn']
             bulkRequest.deletedOn = jsonResponse['bulkRequest']['deletedOn']
-            return json.dump(bulkRequest)
+            return json.dumps(bulkRequest)
         else:
             return Exception(f"Error: {response.status_code} - {response._content}")
 
@@ -244,7 +244,7 @@ class RequestHelper:
             bulkRequestDataElement.CreatedOn = jsonResponse['bulkRequestDataElement']['createdOn']
             bulkRequestDataElement.UpdatedOn = jsonResponse['bulkRequestDataElement']['updatedOn']
             bulkRequestDataElement.DeletedOn = jsonResponse['bulkRequestDataElement']['deletedOn']
-            return json.dump(bulkRequestDataElement)
+            return json.dumps(bulkRequestDataElement)
         else:
             return Exception(f"Error: {response.status_code} - {response._content}")
         
