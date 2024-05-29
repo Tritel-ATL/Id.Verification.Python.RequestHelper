@@ -20,3 +20,6 @@ Remove logging from the required package list
 
 ### 0.8
 Change the way that the library tries to use the Tritel profile
+
+### 0.11
+Revert Previous Changes
