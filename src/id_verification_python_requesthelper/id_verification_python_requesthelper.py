@@ -273,6 +273,73 @@ class RequestHelper:
         else:
             return Exception(f"Error: {response.status_code} - {response._content}")
         
+
+    def createRequest(self, customerId: str, bulkRequestId: str, workflowId: str):
+        """
+        Create a new Request
+        
+        Parameters:
+            customerId (str): Customer Id
+            bulkRequestId (str): Bulk Request Id
+            workflowId (str): Workflow Id
+        
+        Returns:
+            Request
+            or 
+            Exception if error
+        """
+        headers = {'Authorization': f'Bearer {self.userHelper.getToken()}', 'accept': 'application/json', 'Content-Type': 'application/json'}
+        data = f'{{"customerId": "{customerId}", "bulkRequestId": "{bulkRequestId}", "workflowId": "{workflowId}", "status": 1}}'
+        log.debug(f"RequestHelper URL: http://{self.__apiUrl}/Request/CreateRequest?api-version=0.1")
+        log.debug(f"RequestHelper.createRequest: {data}")
+        response = requests.post(f'http://{self.__apiUrl}/Request/CreateRequest?api-version=0.1', headers=headers, data=data)
+        if response.status_code == 201:
+            request: Request = Request()
+            jsonResponse = response.json()
+            request.requestId = jsonResponse['request']['requestId']
+            request.customerId = jsonResponse['request']['customerId']
+            request.workflowId = jsonResponse['request']['workflowId']
+            request.status = jsonResponse['request']['status']
+            request.createdOn = jsonResponse['request']['createdOn']
+            request.updatedOn = jsonResponse['request']['updatedOn']
+            request.completedOn = jsonResponse['request']['completedOn']
+            request.deletedOn = jsonResponse['request']['deletedOn']
+            return request
+        else:
+            return Exception(f"Error: {response.status_code} - {response._content}"
+
+    def createRequestDataElement(self, requestId: str, dataField: str, dataValue: str):
+        """
+        Create Request Data Element
+
+        Args:
+            requestId (str): _description_
+            dataField (str): _description_
+            dataValue (str): _description_
+
+        Returns:
+            RequestDataElement: The Data Element that was created
+            or
+            Exception if error
+        """
+        headers = {'Authorization': f'Bearer {self.userHelper.getToken()}', 'accept': 'application/json', 'Content-Type': 'application/json'}
+        data = f'{{"requestId": "{requestId}", "dataField": "{dataField}", "dataValue": "{dataValue}"}}'
+        log.debug(f"RequestHelper URL: http://{self.__apiUrl}/RequestDataElement/CreateRequestDataElement?api-version=0.1")
+        log.debug(f"RequestHelper.createRequestDataElement: {data}")
+        response = requests.post(f'http://{self.__apiUrl}/RequestDataElement/CreateRequestDataElement?api-version=0.1', headers=headers, data=data)
+        if response.status_code == 201:
+            requestDataElement: RequestDataElement = RequestDataElement()
+            jsonResponse = response.json()
+            requestDataElement.RequestDataElementId = jsonResponse['requestDataElement']['requestDataElementId']
+            requestDataElement.RequestId = jsonResponse['requestDataElement']['requestId']
+            requestDataElement.DataField = jsonResponse['requestDataElement']['dataField']
+            requestDataElement.DataValue = jsonResponse['requestDataElement']['dataValue']
+            requestDataElement.CreatedOn = jsonResponse['requestDataElement']['createdOn']
+            requestDataElement.UpdatedOn = jsonResponse['requestDataElement']['updatedOn']
+            requestDataElement.DeletedOn = jsonResponse['requestDataElement']['deletedOn']
+            return requestDataElement
+        else:
+            return Exception(f"Error: {response.status_code} - {response._content}")
         
 class BulkRequestStatus(Enum):
     # <summary>The bulk request is newly created.  And has no processing started or completed on it.</summary>
@@ -325,6 +392,57 @@ class BulkRequestDataElement:
     def __str__(self):
         stringOutput = f"BulkRequestDataElementId: {self.BulkRequestDataElementId}\n"
         stringOutput += f"BulkRequestId: {self.BulkRequestId}\n"
+        stringOutput += f"DataField: {self.DataField}\n"
+        stringOutput += f"DataValue: {self.DataValue}\n"
+        stringOutput += f"CreatedOn: {self.CreatedOn}\n"
+        stringOutput += f"UpdatedOn: {self.UpdatedOn}\n"
+        stringOutput += f"DeletedOn: {self.DeletedOn}\n"
+        return stringOutput
+
+class RequestStatus(Enum):
+    # <summary>The request is newly created.  And has no processing started or completed on it.</summary>
+    New = 1
+    # <summary>The request is pending.</summary>
+    Pending = 2
+    # <summary>The request is in progress.</summary>
+    InProgress = 3
+    # <summary>The request is completed.</summary>
+    Completed = 4
+    # <summary>The request is failed.</summary>
+    
+class Request:
+    # Properties
+    requestId: str
+    customerId: str
+    workflowId: str
+    status: RequestStatus
+    createdOn: datetime
+    updatedOn: datetime
+    completedOn: datetime
+    deletedOn: datetime
+
+    def __str__(self) -> str:
+        stringOutput = f"RequestId: {self.requestId}\n"
+        stringOutput += f"CustomerId: {self.customerId}\n"
+        stringOutput += f"WorkflowId: {self.workflowId}\n"
+        stringOutput += f"Status: {self.status}\n"
+        stringOutput += f"CreatedOn: {self.createdOn}\n"
+        stringOutput += f"UpdatedOn: {self.updatedOn}\n"
+        stringOutput += f"CompletedOn: {self.completedOn}\n"
+        stringOutput += f"DeletedOn: {self.deletedOn}\n"
+        return stringOutput
+    
+class RequestDataElement:
+    # Properties
+    RequestId: str
+    DataField: str
+    DataValue: str
+    CreatedOn: datetime
+    UpdatedOn: datetime
+    DeletedOn: datetime
+    
+    def __str__(self):
+        stringOutput = f"RequestId: {self.RequestId}\n"
         stringOutput += f"DataField: {self.DataField}\n"
         stringOutput += f"DataValue: {self.DataValue}\n"
         stringOutput += f"CreatedOn: {self.CreatedOn}\n"

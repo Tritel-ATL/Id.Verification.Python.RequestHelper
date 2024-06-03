@@ -32,3 +32,7 @@ print(f"Bulk Request: {bulkRequests}")
 exists = requesthelper.checkBulkRequestFileExists("f21ffc01-4485-4015-abb9-21c100c8d294","e11ffc01-4485-4015-abb9-21c100c8d200","myfile.txt")
 
 print(f"Exists: {exists}")
+
+bulkRequest = requesthelper.createBulkRequest("669b7fb6-9f8c-46df-b0d6-89203f1ddd0b","669b7fb6-9f8c-46df-b0d6-89203f1ddd0b")
+
+print(f"Bulk Request: {bulkRequest}")
