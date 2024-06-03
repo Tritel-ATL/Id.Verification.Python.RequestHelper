@@ -32,3 +32,6 @@ Fix typo
 
 ### 0.14
 Use new UserHelper token and refreshed the token if over 600 seconds old
+
+### 0.15
+Fix timezone expression

@@ -1,5 +1,5 @@
 import boto3
-from datetime import datetime
+from datetime import datetime, timezone
 from enum import Enum
 from id_verification_python_userhelper import UserHelper
 import json
@@ -132,7 +132,7 @@ class RequestHelper:
             or 
             None if not found
         """
-        if self.userHelper.token == None or (datetime.now() - self.userHelper.tokenRefreshed).seconds > MAX_TOKEN_AGE:
+        if self.userHelper.token == None or (datetime.now(timezone.utc) - self.userHelper.tokenRefreshed).seconds > MAX_TOKEN_AGE:
             token = self.userHelper.getToken()
         headers = {'Authorization': f'Bearer {self.userHelper.token}', 'accept': 'application/json', 'Content-Type': 'application/json'}
         data = f'{{"bulkRequestId": "{bulkRequestId}"}}'
@@ -169,7 +169,7 @@ class RequestHelper:
             or 
             None if not found
         """
-        if self.userHelper.token == None or (datetime.now() - self.userHelper.tokenRefreshed).seconds > MAX_TOKEN_AGE:
+        if self.userHelper.token == None or (datetime.now(timezone.utc) - self.userHelper.tokenRefreshed).seconds > MAX_TOKEN_AGE:
             token = self.userHelper.getToken()
         headers = {'Authorization': f'Bearer {self.userHelper.token}', 'accept': 'application/json', 'Content-Type': 'application/json'}
         data = f'{{"customerId": "{customerId}", "workflowId": "{workflowId}","status": 1}}'
@@ -203,7 +203,7 @@ class RequestHelper:
             or 
             None if not found
         """
-        if self.userHelper.token == None or (datetime.now() - self.userHelper.tokenRefreshed).seconds > MAX_TOKEN_AGE:
+        if self.userHelper.token == None or (datetime.now(timezone.utc) - self.userHelper.tokenRefreshed).seconds > MAX_TOKEN_AGE:
             token = self.userHelper.getToken()
         headers = {'Authorization': f'Bearer {self.userHelper.token}', 'accept': 'application/json', 'Content-Type': 'application/json'}
         data = f'{{"bulkRequestId": "{bulkRequestId}"}}'
@@ -240,7 +240,7 @@ class RequestHelper:
         Returns:
             Bulk Request Data Element
         """
-        if self.userHelper.token == None or (datetime.now() - self.userHelper.tokenRefreshed).seconds > MAX_TOKEN_AGE:
+        if self.userHelper.token == None or (datetime.now(timezone.utc) - self.userHelper.tokenRefreshed).seconds > MAX_TOKEN_AGE:
             token = self.userHelper.getToken()
         headers = {'Authorization': f'Bearer {self.userHelper.token}', 'accept': 'application/json', 'Content-Type': 'application/json'}
         data = f'{{"bulkRequestId": "{bulkRequestId}", "dataField": "{dataField}", "dataValue": "{dataValue}"}}'
@@ -274,7 +274,7 @@ class RequestHelper:
         Returns:
             bool: whether or not the filename exists
         """
-        if self.userHelper.token == None or (datetime.now() - self.userHelper.tokenRefreshed).seconds > MAX_TOKEN_AGE:
+        if self.userHelper.token == None or (datetime.now(timezone.utc) - self.userHelper.tokenRefreshed).seconds > MAX_TOKEN_AGE:
             token = self.userHelper.getToken()
         headers = {'Authorization': f'Bearer {self.userHelper.token}', 'accept': 'application/json', 'Content-Type': 'application/json'}
         data = f'{{"customerId": "{customerId}", "workflowId": "{workflowId}", "filename": "{filename}"}}'
@@ -303,7 +303,7 @@ class RequestHelper:
             or 
             Exception if error
         """
-        if self.userHelper.token == None or (datetime.now() - self.userHelper.tokenRefreshed).seconds > MAX_TOKEN_AGE:
+        if self.userHelper.token == None or (datetime.now(timezone.utc) - self.userHelper.tokenRefreshed).seconds > MAX_TOKEN_AGE:
             token = self.userHelper.getToken()
         headers = {'Authorization': f'Bearer {self.userHelper.token}', 'accept': 'application/json', 'Content-Type': 'application/json'}
         data = f'{{"customerId": "{customerId}", "bulkRequestId": "{bulkRequestId}", "workflowId": "{workflowId}", "status": 1}}'
@@ -339,7 +339,7 @@ class RequestHelper:
             or
             Exception if error
         """
-        if self.userHelper.token == None or (datetime.now() - self.userHelper.tokenRefreshed).seconds > MAX_TOKEN_AGE:
+        if self.userHelper.token == None or (datetime.now(timezone.utc) - self.userHelper.tokenRefreshed).seconds > MAX_TOKEN_AGE:
             token = self.userHelper.getToken()
         headers = {'Authorization': f'Bearer {self.userHelper.token}', 'accept': 'application/json', 'Content-Type': 'application/json'}
         data = f'{{"requestId": "{requestId}", "dataField": "{dataField}", "dataValue": "{dataValue}"}}'
