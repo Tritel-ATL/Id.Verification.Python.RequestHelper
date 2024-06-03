@@ -26,3 +26,6 @@ Revert Previous Changes
 
 ### 0.12
 Add **createRequest** and **createRequestDataElement** features
+
+### 0.13
+Fix typo
