@@ -306,7 +306,7 @@ class RequestHelper:
             request.deletedOn = jsonResponse['request']['deletedOn']
             return request
         else:
-            return Exception(f"Error: {response.status_code} - {response._content}"
+            return Exception(f"Error: {response.status_code} - {response._content}")
 
     def createRequestDataElement(self, requestId: str, dataField: str, dataValue: str):
         """
