@@ -7,6 +7,7 @@ import logging
 from multipledispatch import dispatch
 import requests
 
+MAX_TOKEN_AGE = 600
 
 log = logging.getLogger(__name__)
 
@@ -36,6 +37,7 @@ class RequestHelper:
         """
         log.debug("RequestHelper.__init__")
         self.userHelper = userHelper
+        self.userHelper.getToken()
         self.__apiUrl = self.__getApiUrl()
         
     @dispatch(UserHelper, str)
@@ -49,6 +51,7 @@ class RequestHelper:
             RequestHelper object
         """
         self.userHelper = userHelper
+        self.userHelper.getToken()
         self.environment = environment
         self.__apiUrl = self.__getApiUrl()
         
@@ -64,6 +67,7 @@ class RequestHelper:
             RequestHelper object
         """
         self.userHelper = UserHelper(username, password)
+        self.userHelper.getToken()
         self.__apiUrl = self.__getApiUrl()
     
     @dispatch(str, str, str)
@@ -79,6 +83,7 @@ class RequestHelper:
             RequestHelper object
         """
         self.userHelper = UserHelper(username, password)
+        self.userHelper.getToken()
         self.environment = environment
         self.__apiUrl = self.__getApiUrl()
         
@@ -127,7 +132,9 @@ class RequestHelper:
             or 
             None if not found
         """
-        headers = {'Authorization': f'Bearer {self.userHelper.getToken()}', 'accept': 'application/json', 'Content-Type': 'application/json'}
+        if self.userHelper.token == None or (datetime.now() - self.userHelper.tokenRefreshed).seconds > MAX_TOKEN_AGE:
+            token = self.userHelper.getToken()
+        headers = {'Authorization': f'Bearer {self.userHelper.token}', 'accept': 'application/json', 'Content-Type': 'application/json'}
         data = f'{{"bulkRequestId": "{bulkRequestId}"}}'
         log.debug(f"RequestHelper URL: http://{self.__apiUrl}/BulkRequest/GetBulkRequestByBulkRequestId?api-version=0.1")
         log.debug(f"RequestHelper.getBulkRequest: {data}")
@@ -162,7 +169,9 @@ class RequestHelper:
             or 
             None if not found
         """
-        headers = {'Authorization': f'Bearer {self.userHelper.getToken()}', 'accept': 'application/json', 'Content-Type': 'application/json'}
+        if self.userHelper.token == None or (datetime.now() - self.userHelper.tokenRefreshed).seconds > MAX_TOKEN_AGE:
+            token = self.userHelper.getToken()
+        headers = {'Authorization': f'Bearer {self.userHelper.token}', 'accept': 'application/json', 'Content-Type': 'application/json'}
         data = f'{{"customerId": "{customerId}", "workflowId": "{workflowId}","status": 1}}'
         log.debug(f"RequestHelper URL: http://{self.__apiUrl}/BulkRequest/CreateBulkRequest?api-version=0.1")
         log.debug(f"RequestHelper.createBulkRequestCommand: {data}")
@@ -194,7 +203,9 @@ class RequestHelper:
             or 
             None if not found
         """
-        headers = {'Authorization': f'Bearer {self.userHelper.getToken()}', 'accept': 'application/json', 'Content-Type': 'application/json'}
+        if self.userHelper.token == None or (datetime.now() - self.userHelper.tokenRefreshed).seconds > MAX_TOKEN_AGE:
+            token = self.userHelper.getToken()
+        headers = {'Authorization': f'Bearer {self.userHelper.token}', 'accept': 'application/json', 'Content-Type': 'application/json'}
         data = f'{{"bulkRequestId": "{bulkRequestId}"}}'
         log.debug(f"RequestHelper URL: http://{self.__apiUrl}/BulkRequestDataElement/GetBulkRequestDataElementsByBulkRequestId?api-version=0.1")
         log.debug(f"RequestHelper.getBulkRequestDataElementsByBulkRequestId: {data}")
@@ -229,7 +240,9 @@ class RequestHelper:
         Returns:
             Bulk Request Data Element
         """
-        headers = {'Authorization': f'Bearer {self.userHelper.getToken()}', 'accept': 'application/json', 'Content-Type': 'application/json'}
+        if self.userHelper.token == None or (datetime.now() - self.userHelper.tokenRefreshed).seconds > MAX_TOKEN_AGE:
+            token = self.userHelper.getToken()
+        headers = {'Authorization': f'Bearer {self.userHelper.token}', 'accept': 'application/json', 'Content-Type': 'application/json'}
         data = f'{{"bulkRequestId": "{bulkRequestId}", "dataField": "{dataField}", "dataValue": "{dataValue}"}}'
         log.debug(f"RequestHelper URL: http://{self.__apiUrl}/BulkRequestDataElement/CreateBulkRequestDataElement?api-version=0.1")
         log.debug(f"RequestHelper.createBulkRequestDataElement: {data}")
@@ -261,7 +274,9 @@ class RequestHelper:
         Returns:
             bool: whether or not the filename exists
         """
-        headers = {'Authorization': f'Bearer {self.userHelper.getToken()}', 'accept': 'application/json', 'Content-Type': 'application/json'}
+        if self.userHelper.token == None or (datetime.now() - self.userHelper.tokenRefreshed).seconds > MAX_TOKEN_AGE:
+            token = self.userHelper.getToken()
+        headers = {'Authorization': f'Bearer {self.userHelper.token}', 'accept': 'application/json', 'Content-Type': 'application/json'}
         data = f'{{"customerId": "{customerId}", "workflowId": "{workflowId}", "filename": "{filename}"}}'
         log.debug(f"RequestHelper URL: http://{self.__apiUrl}/BulkRequestDataElement/BulkRequestFileExists?api-version=0.2")
         log.debug(f"RequestHelper.BulkRequestFileExists: {data}")
@@ -288,7 +303,9 @@ class RequestHelper:
             or 
             Exception if error
         """
-        headers = {'Authorization': f'Bearer {self.userHelper.getToken()}', 'accept': 'application/json', 'Content-Type': 'application/json'}
+        if self.userHelper.token == None or (datetime.now() - self.userHelper.tokenRefreshed).seconds > MAX_TOKEN_AGE:
+            token = self.userHelper.getToken()
+        headers = {'Authorization': f'Bearer {self.userHelper.token}', 'accept': 'application/json', 'Content-Type': 'application/json'}
         data = f'{{"customerId": "{customerId}", "bulkRequestId": "{bulkRequestId}", "workflowId": "{workflowId}", "status": 1}}'
         log.debug(f"RequestHelper URL: http://{self.__apiUrl}/Request/CreateRequest?api-version=0.1")
         log.debug(f"RequestHelper.createRequest: {data}")
@@ -322,7 +339,9 @@ class RequestHelper:
             or
             Exception if error
         """
-        headers = {'Authorization': f'Bearer {self.userHelper.getToken()}', 'accept': 'application/json', 'Content-Type': 'application/json'}
+        if self.userHelper.token == None or (datetime.now() - self.userHelper.tokenRefreshed).seconds > MAX_TOKEN_AGE:
+            token = self.userHelper.getToken()
+        headers = {'Authorization': f'Bearer {self.userHelper.token}', 'accept': 'application/json', 'Content-Type': 'application/json'}
         data = f'{{"requestId": "{requestId}", "dataField": "{dataField}", "dataValue": "{dataValue}"}}'
         log.debug(f"RequestHelper URL: http://{self.__apiUrl}/RequestDataElement/CreateRequestDataElement?api-version=0.1")
         log.debug(f"RequestHelper.createRequestDataElement: {data}")

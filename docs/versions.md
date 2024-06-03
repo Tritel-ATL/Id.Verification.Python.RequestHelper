@@ -29,3 +29,6 @@ Add **createRequest** and **createRequestDataElement** features
 
 ### 0.13
 Fix typo
+
+### 0.14
+Use new UserHelper token and refreshed the token if over 600 seconds old
