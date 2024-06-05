@@ -9,8 +9,8 @@ import requests
 import time
 
 MAX_TOKEN_AGE = 600
-MAX_RETRY_COUNT = 3
-WAIT_TIME_BETWEEN_RETRIES = 5
+MAX_RETRY_COUNT = 5
+WAIT_TIME_BETWEEN_RETRIES = 15
 
 log = logging.getLogger(__name__)
 
@@ -333,11 +333,13 @@ class RequestHelper:
                 
             except requests.exceptions.ConnectionError as re:
                 attempt += 1
-                log.warning(f"Error: {re}. Attempt {attempt} of {MAX_RETRY_COUNT}")
-                time.sleep(WAIT_TIME_BETWEEN_RETRIES) # Wait 5 seconds before trying again
+                log.warning(f"Error: {re}. Attempt {attempt} of {MAX_RETRY_COUNT}.  Waiting {WAIT_TIME_BETWEEN_RETRIES * attempt} seconds before trying again.")
+                time.sleep(WAIT_TIME_BETWEEN_RETRIES * attempt) # Wait before trying again
                 
             except Exception as e:
                 return Exception(f"Error: {response.status_code} - {response._content}")
+        
+        return Exception(f"Error: Max retries exceeded")
 
     def createRequestDataElement(self, requestId: str, dataField: str, dataValue: str):
         """
@@ -379,11 +381,14 @@ class RequestHelper:
                 
             except requests.exceptions.ConnectionError as re:
                 attempt += 1
-                log.warning(f"Error: {re}. Attempt {attempt} of {MAX_RETRY_COUNT}")
-                time.sleep(WAIT_TIME_BETWEEN_RETRIES) # Wait 5 seconds before trying again
+                log.warning(f"Error: {re}. Attempt {attempt} of {MAX_RETRY_COUNT}.  Waiting {WAIT_TIME_BETWEEN_RETRIES * attempt} seconds before trying again.")
+
+                time.sleep(WAIT_TIME_BETWEEN_RETRIES * attempt) # Wait before trying again
                 
             except Exception as e:
                 return Exception(f"Error: {response.status_code} - {response._content}")
+            
+        return Exception(f"Error: Max retries exceeded")
         
 class BulkRequestStatus(Enum):
     # <summary>The bulk request is newly created.  And has no processing started or completed on it.</summary>
