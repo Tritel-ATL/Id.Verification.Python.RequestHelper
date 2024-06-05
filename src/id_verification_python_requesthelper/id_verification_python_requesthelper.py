@@ -6,8 +6,11 @@ import json
 import logging
 from multipledispatch import dispatch
 import requests
+import time
 
 MAX_TOKEN_AGE = 600
+MAX_RETRY_COUNT = 3
+WAIT_TIME_BETWEEN_RETRIES = 5
 
 log = logging.getLogger(__name__)
 
@@ -303,27 +306,38 @@ class RequestHelper:
             or 
             Exception if error
         """
-        if self.userHelper.token == None or (datetime.now(timezone.utc) - self.userHelper.tokenRefreshed).seconds > MAX_TOKEN_AGE:
-            token = self.userHelper.getToken()
-        headers = {'Authorization': f'Bearer {self.userHelper.token}', 'accept': 'application/json', 'Content-Type': 'application/json'}
-        data = f'{{"customerId": "{customerId}", "bulkRequestId": "{bulkRequestId}", "workflowId": "{workflowId}", "status": 1}}'
-        log.debug(f"RequestHelper URL: http://{self.__apiUrl}/Request/CreateRequest?api-version=0.1")
-        log.debug(f"RequestHelper.createRequest: {data}")
-        response = requests.post(f'http://{self.__apiUrl}/Request/CreateRequest?api-version=0.1', headers=headers, data=data)
-        if response.status_code == 201:
-            request: Request = Request()
-            jsonResponse = response.json()
-            request.requestId = jsonResponse['request']['requestId']
-            request.customerId = jsonResponse['request']['customerId']
-            request.workflowId = jsonResponse['request']['workflowId']
-            request.status = jsonResponse['request']['status']
-            request.createdOn = jsonResponse['request']['createdOn']
-            request.updatedOn = jsonResponse['request']['updatedOn']
-            request.completedOn = jsonResponse['request']['completedOn']
-            request.deletedOn = jsonResponse['request']['deletedOn']
-            return request
-        else:
-            return Exception(f"Error: {response.status_code} - {response._content}")
+        attempt = 0
+        while attempt < MAX_RETRY_COUNT:
+            try:
+                if self.userHelper.token == None or (datetime.now(timezone.utc) - self.userHelper.tokenRefreshed).seconds > MAX_TOKEN_AGE:
+                    token = self.userHelper.getToken()
+                headers = {'Authorization': f'Bearer {self.userHelper.token}', 'accept': 'application/json', 'Content-Type': 'application/json'}
+                data = f'{{"customerId": "{customerId}", "bulkRequestId": "{bulkRequestId}", "workflowId": "{workflowId}", "status": 1}}'
+                log.debug(f"RequestHelper URL: http://{self.__apiUrl}/Request/CreateRequest?api-version=0.1")
+                log.debug(f"RequestHelper.createRequest: {data}")
+                response = requests.post(f'http://{self.__apiUrl}/Request/CreateRequest?api-version=0.1', headers=headers, data=data)
+                if response.status_code == 201:
+                    request: Request = Request()
+                    jsonResponse = response.json()
+                    request.requestId = jsonResponse['request']['requestId']
+                    request.customerId = jsonResponse['request']['customerId']
+                    request.workflowId = jsonResponse['request']['workflowId']
+                    request.status = jsonResponse['request']['status']
+                    request.createdOn = jsonResponse['request']['createdOn']
+                    request.updatedOn = jsonResponse['request']['updatedOn']
+                    request.completedOn = jsonResponse['request']['completedOn']
+                    request.deletedOn = jsonResponse['request']['deletedOn']
+                    return request
+                else:
+                    return Exception(f"Error: {response.status_code} - {response._content}")
+                
+            except requests.exceptions.ConnectionError as re:
+                attempt += 1
+                log.warning(f"Error: {re}. Attempt {attempt} of {MAX_RETRY_COUNT}")
+                time.sleep(WAIT_TIME_BETWEEN_RETRIES) # Wait 5 seconds before trying again
+                
+            except Exception as e:
+                return Exception(f"Error: {response.status_code} - {response._content}")
 
     def createRequestDataElement(self, requestId: str, dataField: str, dataValue: str):
         """
@@ -339,26 +353,37 @@ class RequestHelper:
             or
             Exception if error
         """
-        if self.userHelper.token == None or (datetime.now(timezone.utc) - self.userHelper.tokenRefreshed).seconds > MAX_TOKEN_AGE:
-            token = self.userHelper.getToken()
-        headers = {'Authorization': f'Bearer {self.userHelper.token}', 'accept': 'application/json', 'Content-Type': 'application/json'}
-        data = f'{{"requestId": "{requestId}", "dataField": "{dataField}", "dataValue": "{dataValue}"}}'
-        log.debug(f"RequestHelper URL: http://{self.__apiUrl}/RequestDataElement/CreateRequestDataElement?api-version=0.1")
-        log.debug(f"RequestHelper.createRequestDataElement: {data}")
-        response = requests.post(f'http://{self.__apiUrl}/RequestDataElement/CreateRequestDataElement?api-version=0.1', headers=headers, data=data)
-        if response.status_code == 201:
-            requestDataElement: RequestDataElement = RequestDataElement()
-            jsonResponse = response.json()
-            requestDataElement.RequestDataElementId = jsonResponse['requestDataElement']['requestDataElementId']
-            requestDataElement.RequestId = jsonResponse['requestDataElement']['requestId']
-            requestDataElement.DataField = jsonResponse['requestDataElement']['dataField']
-            requestDataElement.DataValue = jsonResponse['requestDataElement']['dataValue']
-            requestDataElement.CreatedOn = jsonResponse['requestDataElement']['createdOn']
-            requestDataElement.UpdatedOn = jsonResponse['requestDataElement']['updatedOn']
-            requestDataElement.DeletedOn = jsonResponse['requestDataElement']['deletedOn']
-            return requestDataElement
-        else:
-            return Exception(f"Error: {response.status_code} - {response._content}")
+        attempt = 0
+        while attempt < MAX_RETRY_COUNT:
+            try:
+                if self.userHelper.token == None or (datetime.now(timezone.utc) - self.userHelper.tokenRefreshed).seconds > MAX_TOKEN_AGE:
+                    token = self.userHelper.getToken()
+                headers = {'Authorization': f'Bearer {self.userHelper.token}', 'accept': 'application/json', 'Content-Type': 'application/json'}
+                data = f'{{"requestId": "{requestId}", "dataField": "{dataField}", "dataValue": "{dataValue}"}}'
+                log.debug(f"RequestHelper URL: http://{self.__apiUrl}/RequestDataElement/CreateRequestDataElement?api-version=0.1")
+                log.debug(f"RequestHelper.createRequestDataElement: {data}")
+                response = requests.post(f'http://{self.__apiUrl}/RequestDataElement/CreateRequestDataElement?api-version=0.1', headers=headers, data=data)
+                if response.status_code == 201:
+                    requestDataElement: RequestDataElement = RequestDataElement()
+                    jsonResponse = response.json()
+                    requestDataElement.RequestDataElementId = jsonResponse['requestDataElement']['requestDataElementId']
+                    requestDataElement.RequestId = jsonResponse['requestDataElement']['requestId']
+                    requestDataElement.DataField = jsonResponse['requestDataElement']['dataField']
+                    requestDataElement.DataValue = jsonResponse['requestDataElement']['dataValue']
+                    requestDataElement.CreatedOn = jsonResponse['requestDataElement']['createdOn']
+                    requestDataElement.UpdatedOn = jsonResponse['requestDataElement']['updatedOn']
+                    requestDataElement.DeletedOn = jsonResponse['requestDataElement']['deletedOn']
+                    return requestDataElement
+                else:
+                    return Exception(f"Error: {response.status_code} - {response._content}")
+                
+            except requests.exceptions.ConnectionError as re:
+                attempt += 1
+                log.warning(f"Error: {re}. Attempt {attempt} of {MAX_RETRY_COUNT}")
+                time.sleep(WAIT_TIME_BETWEEN_RETRIES) # Wait 5 seconds before trying again
+                
+            except Exception as e:
+                return Exception(f"Error: {response.status_code} - {response._content}")
         
 class BulkRequestStatus(Enum):
     # <summary>The bulk request is newly created.  And has no processing started or completed on it.</summary>

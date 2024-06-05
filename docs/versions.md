@@ -35,3 +35,7 @@ Use new UserHelper token and refreshed the token if over 600 seconds old
 
 ### 0.15
 Fix timezone expression
+
+### 0.16
+Add retries for Connection Errors to the APIs
+    - This is attempt to resolve Load Balancer scaling issues on the APIs
