@@ -8,6 +8,8 @@ from multipledispatch import dispatch
 import requests
 import time
 
+import requests.adapters
+
 MAX_TOKEN_AGE = 600
 MAX_RETRY_COUNT = 5
 WAIT_TIME_BETWEEN_RETRIES = 15
@@ -178,21 +180,25 @@ class RequestHelper:
         data = f'{{"customerId": "{customerId}", "workflowId": "{workflowId}","status": 1}}'
         log.debug(f"RequestHelper URL: http://{self.__apiUrl}/BulkRequest/CreateBulkRequest?api-version=0.1")
         log.debug(f"RequestHelper.createBulkRequestCommand: {data}")
-        response = requests.post(f'http://{self.__apiUrl}/BulkRequest/CreateBulkRequest?api-version=0.1', headers=headers, data=data)
-        if response.status_code == 201:
-            bulkRequest: BulkRequest = BulkRequest()
-            jsonResponse = response.json()
-            bulkRequest.bulkRequestId = jsonResponse['bulkRequest']['bulkRequestId']
-            bulkRequest.customerId = jsonResponse['bulkRequest']['customerId']
-            bulkRequest.workflowId = jsonResponse['bulkRequest']['workflowId']
-            bulkRequest.status = jsonResponse['bulkRequest']['status']
-            bulkRequest.createdOn = jsonResponse['bulkRequest']['createdOn']
-            bulkRequest.updatedOn = jsonResponse['bulkRequest']['updatedOn']
-            bulkRequest.completedOn = jsonResponse['bulkRequest']['completedOn']
-            bulkRequest.deletedOn = jsonResponse['bulkRequest']['deletedOn']
-            return json.dumps(bulkRequest)
-        else:
-            return Exception(f"Error: {response.status_code} - {response._content}")
+        with requests.Session() as session:
+            retries = requests.adapters.Retry(total=5, backoff_factor=1, status_forcelist=[ 500, 502, 503, 504 ], allowed_methods=frozenset(['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS']))
+            session.mount('http://', requests.adapters.HTTPAdapter(max_retries=retries))
+            session.mount('https://', requests.adapters.HTTPAdapter(max_retries=retries))    
+            response = session.post(f'http://{self.__apiUrl}/BulkRequest/CreateBulkRequest?api-version=0.2', headers=headers, data=data)
+            if response.status_code == 201:
+                bulkRequest: BulkRequest = BulkRequest()
+                jsonResponse = response.json()
+                bulkRequest.bulkRequestId = jsonResponse['bulkRequest']['bulkRequestId']
+                bulkRequest.customerId = jsonResponse['bulkRequest']['customerId']
+                bulkRequest.workflowId = jsonResponse['bulkRequest']['workflowId']
+                bulkRequest.status = jsonResponse['bulkRequest']['status']
+                bulkRequest.createdOn = jsonResponse['bulkRequest']['createdOn']
+                bulkRequest.updatedOn = jsonResponse['bulkRequest']['updatedOn']
+                bulkRequest.completedOn = jsonResponse['bulkRequest']['completedOn']
+                bulkRequest.deletedOn = jsonResponse['bulkRequest']['deletedOn']
+                return json.dumps(bulkRequest)
+            else:
+                return Exception(f"Error: {response.status_code} - {response._content}")
 
     def getBulkRequestDataElementsByBulkRequestId(self, bulkRequestId: str):
         """
@@ -210,26 +216,30 @@ class RequestHelper:
             token = self.userHelper.getToken()
         headers = {'Authorization': f'Bearer {self.userHelper.token}', 'accept': 'application/json', 'Content-Type': 'application/json'}
         data = f'{{"bulkRequestId": "{bulkRequestId}"}}'
-        log.debug(f"RequestHelper URL: http://{self.__apiUrl}/BulkRequestDataElement/GetBulkRequestDataElementsByBulkRequestId?api-version=0.1")
+        log.debug(f"RequestHelper URL: http://{self.__apiUrl}/BulkRequestDataElement/GetBulkRequestDataElementsByBulkRequestId?api-version=0.2")
         log.debug(f"RequestHelper.getBulkRequestDataElementsByBulkRequestId: {data}")
-        response = requests.put(f'http://{self.__apiUrl}/BulkRequestDataElement/GetBulkRequestDataElementsByBulkRequestId?api-version=0.1', headers=headers, data=data)
-        bulkRequestDataElements = []
-        if response.status_code == 200:
-            for record in response.json()['bulkRequestDataElement']:
-                bulkRequestDataElement: BulkRequestDataElement = BulkRequestDataElement()
-                bulkRequestDataElement.BulkRequestDataElementId = record['bulkRequestDataElementId']
-                bulkRequestDataElement.BulkRequestId = record['bulkRequestId']
-                bulkRequestDataElement.DataField = record['dataField']
-                bulkRequestDataElement.DataValue = record['dataValue']
-                bulkRequestDataElement.CreatedOn = record['createdOn']
-                bulkRequestDataElement.UpdatedOn = record['updatedOn']
-                bulkRequestDataElement.DeletedOn = record['deletedOn']
-                bulkRequestDataElements.append(bulkRequestDataElement)
-            return bulkRequestDataElements
-        if response.status_code == 404:
-            return None
-        else:
-            return Exception(f"Error: {response.status_code} - {response._content}")   
+        with requests.Session() as session:
+            retries = requests.adapters.Retry(total=5, backoff_factor=1, status_forcelist=[ 500, 502, 503, 504 ], allowed_methods=frozenset(['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS']))
+            session.mount('http://', requests.adapters.HTTPAdapter(max_retries=retries))
+            session.mount('https://', requests.adapters.HTTPAdapter(max_retries=retries))        
+            response = session.put(f'http://{self.__apiUrl}/BulkRequestDataElement/GetBulkRequestDataElementsByBulkRequestId?api-version=0.1', headers=headers, data=data)
+            bulkRequestDataElements = []
+            if response.status_code == 200:
+                for record in response.json()['bulkRequestDataElement']:
+                    bulkRequestDataElement: BulkRequestDataElement = BulkRequestDataElement()
+                    bulkRequestDataElement.BulkRequestDataElementId = record['bulkRequestDataElementId']
+                    bulkRequestDataElement.BulkRequestId = record['bulkRequestId']
+                    bulkRequestDataElement.DataField = record['dataField']
+                    bulkRequestDataElement.DataValue = record['dataValue']
+                    bulkRequestDataElement.CreatedOn = record['createdOn']
+                    bulkRequestDataElement.UpdatedOn = record['updatedOn']
+                    bulkRequestDataElement.DeletedOn = record['deletedOn']
+                    bulkRequestDataElements.append(bulkRequestDataElement)
+                return bulkRequestDataElements
+            if response.status_code == 404:
+                return None
+            else:
+                return Exception(f"Error: {response.status_code} - {response._content}")   
         
     def createBulkRequestDataElement (self, bulkRequestId: str, dataField: str, dataValue: str):
         """
@@ -249,20 +259,24 @@ class RequestHelper:
         data = f'{{"bulkRequestId": "{bulkRequestId}", "dataField": "{dataField}", "dataValue": "{dataValue}"}}'
         log.debug(f"RequestHelper URL: http://{self.__apiUrl}/BulkRequestDataElement/CreateBulkRequestDataElement?api-version=0.1")
         log.debug(f"RequestHelper.createBulkRequestDataElement: {data}")
-        response = requests.post(f'http://{self.__apiUrl}/BulkRequestDataElement/CreateBulkRequestDataElement?api-version=0.1', headers=headers, data=data)
-        if response.status_code == 201:
-            bulkRequestDataElement: BulkRequestDataElement = BulkRequestDataElement()
-            jsonResponse = response.json()
-            bulkRequestDataElement.BulkRequestDataElementId = jsonResponse['bulkRequestDataElement']['bulkRequestDataElementId']
-            bulkRequestDataElement.BulkRequestId = jsonResponse['bulkRequestDataElement']['bulkRequestId']
-            bulkRequestDataElement.DataField = jsonResponse['bulkRequestDataElement']['dataField']
-            bulkRequestDataElement.DataValue = jsonResponse['bulkRequestDataElement']['dataValue']
-            bulkRequestDataElement.CreatedOn = jsonResponse['bulkRequestDataElement']['createdOn']
-            bulkRequestDataElement.UpdatedOn = jsonResponse['bulkRequestDataElement']['updatedOn']
-            bulkRequestDataElement.DeletedOn = jsonResponse['bulkRequestDataElement']['deletedOn']
-            return json.dumps(bulkRequestDataElement)
-        else:
-            return Exception(f"Error: {response.status_code} - {response._content}")
+        with requests.Session() as session:
+            retries = requests.adapters.Retry(total=5, backoff_factor=1, status_forcelist=[ 500, 502, 503, 504 ], allowed_methods=frozenset(['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS']))
+            session.mount('http://', requests.adapters.HTTPAdapter(max_retries=retries))
+            session.mount('https://', requests.adapters.HTTPAdapter(max_retries=retries))
+            response = session.post(f'http://{self.__apiUrl}/BulkRequestDataElement/CreateBulkRequestDataElement?api-version=0.2', headers=headers, data=data, timeout=(5, 30))
+            if response.status_code == 201:
+                bulkRequestDataElement: BulkRequestDataElement = BulkRequestDataElement()
+                jsonResponse = response.json()
+                bulkRequestDataElement.BulkRequestDataElementId = jsonResponse['bulkRequestDataElement']['bulkRequestDataElementId']
+                bulkRequestDataElement.BulkRequestId = jsonResponse['bulkRequestDataElement']['bulkRequestId']
+                bulkRequestDataElement.DataField = jsonResponse['bulkRequestDataElement']['dataField']
+                bulkRequestDataElement.DataValue = jsonResponse['bulkRequestDataElement']['dataValue']
+                bulkRequestDataElement.CreatedOn = jsonResponse['bulkRequestDataElement']['createdOn']
+                bulkRequestDataElement.UpdatedOn = jsonResponse['bulkRequestDataElement']['updatedOn']
+                bulkRequestDataElement.DeletedOn = jsonResponse['bulkRequestDataElement']['deletedOn']
+                return json.dumps(bulkRequestDataElement)
+            else:
+                return Exception(f"Error: {response.status_code} - {response._content}")
         
     def checkBulkRequestFileExists (self, customerId: str, workflowId: str, filename: str):
         """

@@ -1,5 +1,8 @@
 # Version Information
 
+### 0.0.19
+Add retries to Create Request and Create Request Data Element
+
 ### 0.0.18
 Add the destructer and close userhelper 
 
