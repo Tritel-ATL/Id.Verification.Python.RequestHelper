@@ -329,7 +329,8 @@ class RequestHelper:
                     request.deletedOn = jsonResponse['request']['deletedOn']
                     return request
                 else:
-                    return Exception(f"Error: {response.status_code} - {response._content}")
+                    if response.status_code != 499:
+                        return Exception(f"Error: {response.status_code} - {response._content}")
                 
             except requests.exceptions.ConnectionError as re:
                 attempt += 1
@@ -377,7 +378,8 @@ class RequestHelper:
                     requestDataElement.DeletedOn = jsonResponse['requestDataElement']['deletedOn']
                     return requestDataElement
                 else:
-                    return Exception(f"Error: {response.status_code} - {response._content}")
+                    if response.status_code != 499:
+                        return Exception(f"Error: {response.status_code} - {response._content}")
                 
             except requests.exceptions.ConnectionError as re:
                 attempt += 1
@@ -389,7 +391,15 @@ class RequestHelper:
                 return Exception(f"Error: {response.status_code} - {response._content}")
             
         return Exception(f"Error: Max retries exceeded")
+    
+    def close (self):
+        """
+        Close the RequestHelper
+        """
+        self.userHelper.close()
         
+    def __del__ (self):
+        self.close()
 class BulkRequestStatus(Enum):
     # <summary>The bulk request is newly created.  And has no processing started or completed on it.</summary>
     New = 1
