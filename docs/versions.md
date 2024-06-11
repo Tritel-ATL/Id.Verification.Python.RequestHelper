@@ -1,5 +1,8 @@
 # Version Information
 
+### 0.0.20
+Install dependencies packages from requirements.txt file instead of directly in the github workflow
+
 ### 0.0.19
 Add retries to Create Request and Create Request Data Element
 

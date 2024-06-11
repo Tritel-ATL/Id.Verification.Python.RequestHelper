@@ -35,11 +35,12 @@ jobs:
         run: |
           pip install wheel twine setuptools
 
-      - name: Setup CodeArtifact and Install UserHelper Package
+      - name: Setup CodeArtifact and Install dependencies
         run: |
+          python -m pip install --upgrade pip
           export CODEARTIFACT_AUTH_TOKEN=`aws codeartifact get-authorization-token --domain tritelcares --domain-owner 633259327350 --region ap-southeast-1 --query authorizationToken --output text`
           pip config set global.extra-index-url https://aws:$CODEARTIFACT_AUTH_TOKEN@tritelcares-633259327350.d.codeartifact.ap-southeast-1.amazonaws.com/pypi/id-verification-python-repos/simple/
-          pip install id_verification_python_userhelper
+          if [ -f src/id_verification_python_requesthelper/requirements.txt ]; then pip install -r src/id_verification_python_requesthelper/requirements.txt; fi
     
       - name: Build Package
         run: |
